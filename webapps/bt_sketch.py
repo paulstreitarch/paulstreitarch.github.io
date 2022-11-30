@@ -21,12 +21,13 @@ def main():
 
     # Set up the scene
     scene = THREE.Scene.new()
+    #schwarzer hinergrund
     back_color = THREE.Color.new(0.1,0.1,0.1)
-    
+    #weißer hinergrund
+    #back_color = THREE.Color.new(1.0,1.0,1.0)
     scene.background = back_color
     camera = THREE.PerspectiveCamera.new(75, window.innerWidth/window.innerHeight, 0.1, 10000)
-    camera.position.z = 1000
-
+    camera.position.z = 50
     scene.add(camera)
 
     # Graphic Post Processing
@@ -40,24 +41,79 @@ def main():
     # YOUR DESIGN / GEOMETRY GENERATION
     # Geometry Creation
 
-    my_axiom_system = system(0, 4, "X")
+    # Create Materials
+    global material, line_material, material2  
+    color = THREE.Color.new(255,0,0)
+    material = THREE.MeshBasicMaterial.new()
+    material.transparent = True
+    material.opacity = 0.85
+    material.color = color
 
-    draw_system((my_axiom_system), THREE.Vector3.new(0,0,0))
+    line_material = THREE.LineBasicMaterial.new()      
+    line_material.color = THREE.Color.new(255,255,255)
+    
+    #set Parameters
+    sphere = []
+    spheres = []
+    numb = 6
+    geom1_params = {
+                "radius": 7,
+                "widthSegments":12,
+                "heightSegments":8
+    }
+    geom1_params = Object.fromEntries(to_js(geom1_params))
 
+    #generate Geometry
+    geom = THREE.SphereGeometry.new(geom1_params.radius, geom1_params.widthSegments, geom1_params.heightSegments)
+
+    for i in range(3,numb+1,1):
+        geom2 = geom.clone()
+        #Variante1
+        geom2.scale(0.1,0.1,0.1)
+        geom2.translate(0,i+(i/8),0)
+        geom2.scale(1.5*i,1.5*i,1.5*i)
+        #Variante2
+        """geom2.scale(0.05,0.05,0.05)
+        geom2.translate(0,i+(i/2),0)
+        geom2.scale(1.5*i*i/2,0.5*i,1.5*i*i/2)"""
+
+        for j in range(0,8,1):
+            geom2.rotateZ(math.pi/4)
+
+            for k in range(0,8,1):
+                geom2.rotateY(math.pi/4)
+                geom3 = geom2.clone()
+
+                color2 = THREE.Color.new(0.02*(i*i),0,1.0-(0.1*i))
+                #color2 = THREE.Color.new(0,1.0-(0.1*i),0.02*(i*i))
+                material2 = THREE.MeshBasicMaterial.new()
+                material2.transparent = True
+                material2.opacity = 0.5
+                material2.color = color2
+                
+                # draw mesh
+                sphere = THREE.Mesh.new(geom3, material2)
+                spheres.append(sphere)
+                scene.add(sphere)
+                # draw the edge geometrie
+                edges = THREE.EdgesGeometry.new(sphere.geometry)
+                line = THREE.LineSegments.new(edges, line_material)
+                scene.add(line)
+
+    # draw mesh
+    sphere = THREE.Mesh.new(geom, material)
+    spheres.append(sphere)
+    scene.add(sphere)
+    # draw the edge geometrie
+    edges = THREE.EdgesGeometry.new(sphere.geometry)
+    line = THREE.LineSegments.new(edges, line_material)
+    scene.add(line)
+    
 
     #-----------------------------------------------------------------------
     # USER INTERFACE
     # Set up Mouse orbit control
     controls = THREE.OrbitControls.new(camera, renderer.domElement)
-
-    """# Set up GUI
-    global max_iterations
-    max_iterations = []
-
-    gui = window.dat.GUI.new()
-    param_folder = gui.addFolder('Parameters')
-    param_folder.add(max_iterations, 'iterations', 1,5,1)
-    param_folder.open()"""
     
     #-----------------------------------------------------------------------
     # RENDER + UPDATE THE SCENE AND GEOMETRIES
@@ -65,119 +121,10 @@ def main():
     
 #-----------------------------------------------------------------------
 # HELPER FUNCTIONS
-# Define RULES in a function which takes one SYMBOL and applies rules generation
-def generate(symbol):
-    if symbol == "X":
-        return "F[+X]F[-X]F[*X][/X]*X"
-    elif symbol == "F":
-        return "FF"
-    elif symbol == "+":
-        return "+"
-    elif symbol == "-":
-        return "-"
-    elif symbol == "*":
-        return "*"
-    elif symbol == "/":
-        return "/"
-    elif symbol == "[":
-        return "["
-    elif symbol == "]":
-        return "]"
-# A recursive fundtion, which takes an AXIOM as an input and runs the "generate" function for each symbol
-def system(current_iteration, max_iterations, axiom):
-    current_iteration += 1
-    new_axiom = ""
-    for symbol in axiom:
-        new_axiom += generate(symbol)
-    if current_iteration >= max_iterations:
-        return new_axiom
-    else:
-        return system(current_iteration, max_iterations, new_axiom)
-
-def draw_system(axiom, start_pt):
-    move_vec = THREE.Vector3.new(0,15,0)
-    old_states = []
-    old_move_vecs = []
-    lines = []
-    
-
-    for symbol in axiom:
-        if symbol == "F" or symbol == "X":
-            old = THREE.Vector3.new(start_pt.x, start_pt.y, start_pt.z)
-            new_pt = THREE.Vector3.new(start_pt.x, start_pt.y, start_pt.z)
-            new_pt = new_pt.add(move_vec)
-            line = []
-            line.append(old)
-            line.append(new_pt)
-            lines.append(line)
-            #geom1 = THREE.TorusKnotGeometry.new(10,3,64,8)
-            geom1 = THREE.SphereGeometry.new(10, 64, 8)
-            geom1.translate(start_pt.x,start_pt.y,start_pt.z)
-
-            geom = geom1.clone()
-    
-            start_pt = new_pt
-
-        elif symbol == "+": 
-            move_vec.applyAxisAngle(THREE.Vector3.new(0,0,1), math.pi/7)
-        
-        elif symbol == "-":
-            move_vec.applyAxisAngle(THREE.Vector3.new(0,0,1), -math.pi/7)
-
-        elif symbol == "*":
-            move_vec.applyAxisAngle(THREE.Vector3.new(1,0,0), math.pi/7)
-
-        elif symbol == "/":
-            move_vec.applyAxisAngle(THREE.Vector3.new(1,0,0), -math.pi/7)
-        
-        elif symbol == "[":
-            old_state = THREE.Vector3.new(start_pt.x, start_pt.y, start_pt.z)
-            old_move_vec = THREE.Vector3.new(move_vec.x, move_vec.y, move_vec.z)
-            old_states.append(old_state)
-            old_move_vecs.append(old_move_vec)
-
-        elif symbol == "]":
-            start_pt = THREE.Vector3.new(old_states[-1].x, old_states[-1].y, old_states[-1].z)
-            move_vec = THREE.Vector3.new(old_move_vecs[-1].x, old_move_vecs[-1].y, old_move_vecs[-1].z)
-            old_states.pop(-1)
-            old_move_vecs.pop(-1)
-
-    for points in lines:
-        line_geom = THREE.BufferGeometry.new()
-        points = to_js(points)
-
-        line_geom.setFromPoints( points )
-
-        global material, material2, color, vis_line, vis_geom, line_material, edges
-    
-        material = THREE.LineBasicMaterial.new( THREE.Color.new(0x0000ff))
-        
-        vis_line = THREE.Line.new( line_geom, material )
-
-        color = THREE.Color.new(255,0,0)
-        material2 = THREE.MeshBasicMaterial.new()
-        material2.transparent = True
-        material2.opacity = 0.1
-        material2.color = color
-
-        vis_geom = THREE.Mesh.new(geom, material2)
-        global scene
-        scene.add(vis_line)
-        scene.add(vis_geom)
-
-        line_material = THREE.LineBasicMaterial.new()      
-        line_material.color = THREE.Color.new(255,255,255)
-
-        edge = THREE.EdgesGeometry.new(vis_geom.geometry)
-        edges = THREE.LineSegments.new(edge, line_material)
-    
-        scene.add(edges)
-
-
 # Simple render and animate
 def render(*args):
     window.requestAnimationFrame(create_proxy(render))
-    #controls.update()
+    controls.update()
     composer.render()
 
 # Graphical post-processing
