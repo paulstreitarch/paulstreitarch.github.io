@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
     <link rel="stylesheet" href="../style.css">
-    <title>Paul Streit - homework 01 updated</title> 
+    <title>Paul Streit - homework 01</title> 
 </head>
 <body>
     <div class="main-body">
@@ -16,19 +16,20 @@
 			<a href="./" class="nav-link">
 				homework 01</a>
 			<a href="../title_2" class="nav-link">
-				coming soon</a>
+				homework 02</a>
 		</nav>
 
         <main id="main-doc">
             <h1>
-            Test Title 01
+            the MOLECULE
             </h1>
             <section class="main-section" id="description">
                 <header>
-                    Project Description
+                    Description
                 </header>
                 <p>
-                    Please explain about your project here and put an image that shows some design iterations like the one below. Note that it needs to be one single image. Please combine some shots from different design iterations. The following text is only a random example. This geometry consists of rectangles spaced 1m apart along the x-axis. The rectangles have the same height and width but their orientation angle changes by a total of 90 degrees along the length of the resulting geometry, this creates a twist.
+                    Our task for this first assignment was to create an geometry by using nested loops and lists in Pyscript and Three.js. My idea was to create an array of spheres out of an original core sphere (the red one in the middle) and to spin the array around it. I wanted it to appear like a sphere made of spheres, somehow like an atom or some molecules. To de-tensify the middle I scaled the inner spheres down in steps reacting to their positions in the range. But the first array of new spheres were just orientated along the y-axis. That’s why I needed my nested loop inside of the loop that created the first array. The nested loops are the functions that help me rotating the spheres around the z- and y - world axis’ to create that sphere like shape. To make it look better and by playing around I created the changing colors by integrating them in my last loop and using the variable i from the first loop for the different color steps. 
+
                 </p>
                 <img src="../images/design_iterations.jpg" alt="Design Iterations">
             </section>
@@ -38,7 +39,7 @@
                     Algorithm
                 </header>
                 <p>
-                    Please explain a bit about the follwing flow-chart that describe your algorithm. The follwing is only a random flowchart as an example.
+                    have a look at the flowchart:
                 </p>
                 <img src="../images/flowchart.png" alt="Algorithm FlowChart">
 
@@ -50,8 +51,7 @@
                 </header>
                 <body>
                     <p>
-                    Please add the instruction for using the app here. For example in this one, you can create control points that build a polygon by double clicking on the plane.  
-                    </p>
+                    Drag with your mouse to move, use the wheel/trackpad for zooming in and out!
                     <iframe class="responsive-iframe" src="../webapps/bt_index.html"></iframe>
                     <p>
                         <br>
